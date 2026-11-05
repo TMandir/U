@@ -1,34 +1,38 @@
+
+#U
+---
+---
 # Initial orchestration of the blueprint of U
 
-This repository contains an initial Go prototype for modeling an entity with
-identity and state information. The `baselayering` example constructs one
-sample entity and prints the ideal minimum and maximum values for its S, G, and
-K state dimensions.
+This repository is an early Go prototype for an entity model with an identifier
+and state information. The `baselayering` program constructs a sample entity,
+validates its modeled numeric values through Stability Calculus, and prints
+the S, G, and K ideal-state ranges.
 
-The project is an early blueprint and demonstration, not a complete
-orchestration system or a production-ready domain model. The code does not yet
-define the domain meaning or validation rules for S, G, K, or the other
-placeholder fields.
+The prototype demonstrates integration and data flow. It is not a complete
+orchestration system, formal domain specification, or production-ready public
+API.
 
-## Repository contents
-
-- `baselayering/main.go` — sample entity model, constructor, and console output.
-- `console-log.txt` — example output from running the program.
 
 ## Requirements
 
-- Go installed and available on your `PATH`.
+- Go 1.22 or later
+- Network access on the first dependency download
 
-## Run the example
+The Stability Calculus module currently declares its module path as
+`stability-calculus`. The root `go.mod` uses that declared import path and
+replaces it with the versioned GitHub module source. Keep the replacement until
+the upstream module declares its canonical GitHub module path.
+
+## Run
 
 From the repository root:
 
 ```sh
-cd baselayering
-go run main.go
+go run ./baselayering
 ```
 
-Expected output:
+The example's expected output is:
 
 ```text
 S: entity=S id=0 min=SMinState(1.00) max=SMaxState(1.00)
@@ -36,31 +40,56 @@ G: entity=S id=0 min=GMinState(1.00) max=GMaxState(1.00)
 K: entity=S id=0 min=KMinState(1.00) max=KMaxState(1.00)
 ```
 
-## Current model
+If any modeled value is invalid, the program writes a contextual error to
+standard error and exits without printing the state lines.
 
-The example defines an `Entity` composed of an identifier and state. Its state
-includes top-level ideal and general state information, plus the S, G, and K
-dimensions. Each dimension contains an ideal minimum and maximum. The
-`constructor()` function supplies sample values, and `So()`, `Go()`, and
-`Ko()` print the details for their respective dimensions.
+## Validation behavior
 
-The current implementation is illustrative. It does not enforce identifier
-uniqueness, validate minimum and maximum relationships, or specify the
-semantics of the state dimensions. The embedded `Others` fields are
-placeholders.
+The model has nine `Entityinfo.value` values: the top-level ideal minimum and
+maximum, the general state, and the minimum and maximum for each of S, G, and
+K. Before output, `validateEntityValues` passes every number to Stability
+Calculus as both a trustless value and a trust value. Each pair uses the same
+numeric value and factor name.
 
-## Project direction
+Both Stability Calculus constructors enforce that a value is finite and in the
+inclusive range `[0, 1]`. Invalid inputs return
+`stabilitycalculus.ErrValueOutOfRange`; the validation layer wraps that error
+with entity ID and field context, so callers can inspect it with
+`errors.Is`.
 
----
-Next step: Integrating sample `S` behaviour with `Stability Calculus`
----
-This project is not yet production ready.
+The entity ID is associated with validation errors but is **not itself
+validated**. Stability Calculus does not currently define an identifier API or
+identifier rules. This project also does not enforce ID uniqueness or
+minimum/maximum ordering.
+
+## Model and scope
+
+The sample model in `baselayering/main.go` consists of an entity identifier,
+top-level ideal and general state, and S/G/K ideal states. The constructor's
+names and values are illustrative. Embedded `Others` fields are placeholders;
+the prototype does not define the domain semantics of S, G, K, or those
+extension fields.
+
+Before production use, document the domain invariants, define identifier
+semantics, determine the public API, and add persistence and integration
+behavior as required.
+
+## Development checks
+
+Run the test suite, static analysis, and example from the repository root:
+
+```sh
+go test ./...
+go vet ./...
+go run ./baselayering
+```
+
+## References
+
+- [Stability Calculus](https://github.com/TMandir/Stability-Calculus/)
+- [Sunya](https://github.com/letbecool/Sunya)
 
 ## Copyright
 
-Copyright (c) 2026 Trustless Madir Invention and Innovation Center. All rights
+Copyright (c) 2026 Trustless Mandir Invention and Innovation Center. All rights
 reserved.
-
-## Further details
-    See: https://github.com/letbecool/Sunya
-    see: https://github.com/TMandir/Stability-Calculus/

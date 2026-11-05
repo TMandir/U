@@ -1,12 +1,22 @@
-// constructing a base layer of entities with ideal states and identifiers for S, G, and K with respect to S. Each entity has a unique identifier and ideal state information.
-// this is sample example that the future work will take reference to this work.
+// This example models an entity with ideal states for S, G, and K.
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
 
 	entity := constructor()
+
+	//using the validateEntityValues function to check the entity's values against Stability Calculus
+	if err := validateEntityValues(entity); err != nil {
+		fmt.Fprintf(os.Stderr, "invalid entity: %v\n", err)
+		os.Exit(1)
+	}
+
+	//entrytest() is just for the test of example
 	entrytest(entity)
 
 }
@@ -166,6 +176,7 @@ func constructor() Entity {
 func So(entity Entity) {
 
 	printIdealDetails("S", entity.Entitystate.S.Ideal, entity.Entityidentifer.Entityid)
+
 }
 
 func Go(entity Entity) {
