@@ -1,0 +1,4 @@
+gopal@gopal-ZenBook-UX425UG-UM425UG:~/poc-muckup/U/baselayering$ go run main.go 
+S: entity=S id=0 min=SMinState(1.00) max=SMaxState(1.00)
+G: entity=S id=0 min=GMinState(1.00) max=GMaxState(1.00)
+K: entity=S id=0 min=KMinState(1.00) max=KMaxState(1.00)
